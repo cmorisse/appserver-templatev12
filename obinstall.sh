@@ -395,7 +395,7 @@ function install_wkhtml2pdf_ubuntu {
 function install_prerequisites {
     install_packages_${IKIO_OS}_${IKIO_OS_VERSION_CODENAME}
     install_wkhtml2pdf_${IKIO_OS}
-    if [ -z ${P_USE_PYENV:-} ]; then  
+    if [ ${P_USE_PYENV:-None} != None ]; then  
         install_pyenv
         install_py37
     fi
@@ -450,7 +450,15 @@ function reset_odoo {
 
 
 function dev_test {
-    install_wkhtml2pdf_${IKIO_OS}
+    P_USE_PYENV=3.7.0
+    #P_USE_PYENV=
+    
+    if [ ${P_USE_PYENV:-None} != None ]; then  
+        echo "is set"
+    fi
+    
+
+    
 }
 
 
