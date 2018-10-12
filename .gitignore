@@ -1,0 +1,32 @@
+.hg/
+*.pyc
+
+# For buildout
+.installed.cfg
+bin/
+buildout.cfg
+develop-eggs/
+develop-src/
+downloads/
+eggs/
+etc/
+parts/
+py27/
+py3?/
+/upgrade.py
+.idea/
+# For v8, we locate data_dir in the project directory
+odoo8_data_dir/
+
+#
+
+# For Audaxis addons structure
+/**/funkload/log/
+
+# For buildout development
+a.r.odoo/
+setuptools-*.zip
+# project specific
+
+# pyenv
+.python-version
