@@ -58,6 +58,7 @@ function print_help_message {
     echo    
     echo "Available commands:"
     echo "   help               Prints this message."
+    echo "   setup-locale       Setup locale (default=$P_LOCALE)"
     echo "   prerequisites      Installs system prerequisites specific to \"$IKIO_OS $IKIO_OS_VERSION\""
     echo "   postgresql         Installs postgreSQL."
     echo "   odoo               Installs Odoo."
@@ -142,6 +143,10 @@ function parseargs {
             ;;
             reset)  # Reset odoo install
             SCRIPT_COMMAND=reset_odoo
+            shift # past argument with no value
+            ;;
+            setup-locale)  # Setup Linux locale
+            SCRIPT_COMMAND=setup_locale
             shift # past argument with no value
             ;;
             prerequisites)  # Install odoo command
@@ -388,7 +393,6 @@ function install_wkhtml2pdf_ubuntu {
 
 # installs all system prerequistes
 function install_prerequisites {
-    setup_locale
     install_packages_${IKIO_OS}_${IKIO_OS_VERSION_CODENAME}
     install_wkhtml2pdf_${IKIO_OS}
     install_pyenv
