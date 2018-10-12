@@ -8,7 +8,7 @@ IKIO_OS="${IKIO_OS#\"}"
 IKIO_OS_VERSION=`cat /etc/os-release | grep VERSION_ID= | cut -d "=" -f 2 | cut -d "\"" -f 2`
 IKIO_OS_VERSION_CODENAME=`cat /etc/os-release | grep VERSION_CODENAME= | cut -d "=" -f 2 | cut -d "\"" -f 2`
 
-
+#P_USE_PYENV=3.7.0
 P_ODOO_VERSION=11
 P_PG_VERSION=10
 P_USERNAME=$USER
@@ -244,7 +244,7 @@ function install_packages_ubuntu_bionic {
     sudo apt install -y libz-dev gcc
     sudo apt install -y libxml2-dev libxslt1-dev
     # For Python 3.7
-    sudo apt install -y libbz2-dev libreadline-dev libsqlite3-dev
+    sudo apt install -y libbz2-dev libreadline-dev libsqlite3-dev zlib1g-dev
     sudo apt install -y libpq-dev
     sudo apt install -y libldap2-dev libsasl2-dev
     sudo apt install -y libjpeg-dev libfreetype6-dev liblcms2-dev
@@ -395,8 +395,10 @@ function install_wkhtml2pdf_ubuntu {
 function install_prerequisites {
     install_packages_${IKIO_OS}_${IKIO_OS_VERSION_CODENAME}
     install_wkhtml2pdf_${IKIO_OS}
-    install_pyenv
-    install_py37
+    if [ -z ${P_USE_PYENV:-} ]; then  
+        install_pyenv
+        install_py37
+    fi
     echo "Prerequisites installation finished. You must reconnect to update shell environment."
 }
 
@@ -405,17 +407,17 @@ function install_odoo {
     
     generate_buildoutcfg
 
-    if [ -d py37 ]; then
+    if [ -d py3x ]; then
         echo "install.sh has already been launched."
         echo "So you must either use bin/buildout to update or launch \"install.sh reset\" to remove all buildout installed items."
         exit -1
     fi
-    python3 -m venv py37
-    py37/bin/pip install --upgrade pip
-    py37/bin/pip install --upgrade setuptools==39.0.1
-    py37/bin/pip install zc.buildout==2.12.2
-    py37/bin/pip install $PYPI_INDEX cython==0.28.5
-    py37/bin/buildout
+    python3 -m venv py3x
+    py3x/bin/pip install --upgrade pip
+    py3x/bin/pip install --upgrade setuptools==39.0.1
+    py3x/bin/pip install zc.buildout==2.12.2
+    py3x/bin/pip install $PYPI_INDEX cython==0.28.5
+    py3x/bin/buildout
 
     
     #if [ $RUNNING_ON == "Darwin" ]; then
