@@ -61,6 +61,7 @@ function print_help_message {
     echo "   setup-locale       Setup locale (default=$P_LOCALE)"
     echo "   prerequisites      Installs system prerequisites specific to \"$IKIO_OS $IKIO_OS_VERSION\""
     echo "   postgresql         Installs postgreSQL."
+    echo "   dependencies       Install dependencies specific to this server by running ./install_dependencies.sh if it exists."
     echo "   odoo               Installs Odoo."
     echo "   dependencies       Installs dependencies specific to this project."
     echo "   reset              Remove all buildout installed files."
@@ -153,12 +154,12 @@ function parseargs {
             SCRIPT_COMMAND=install_prerequisites
             shift # past argument with no value
             ;;
-            postgresql)  # Install odoo command
-            SCRIPT_COMMAND=install_postgresql
+            dependencies)
+            SCRIPT_COMMAND=install_dependencies
             shift # past argument with no value
             ;;
-            dependencies)  # Install odoo command
-            SCRIPT_COMMAND=install_dependencies
+            postgresql)  # Install odoo command
+            SCRIPT_COMMAND=install_postgresql
             shift # past argument with no value
             ;;
             devtest)  # This is an undocumented command used for script writing and debugging
@@ -450,6 +451,13 @@ function reset_odoo {
     echo "    Done."
 }
 
+function install_dependencies {
+    if [ -f install_dependencies.sh ]; then    
+        sh install_dependencies.sh
+    else
+        echo "No project specific 'install_dependencies.sh' script found."
+    fi
+}
 
 function dev_test {
     P_USE_PYENV=3.7.0
