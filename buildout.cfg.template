@@ -33,6 +33,7 @@ addons = 	local ./project_addons/
 eggs = num2words
        phonenumbers
        chardet
+       psycogreen
 
 #
 # Odoo configuration
