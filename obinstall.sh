@@ -398,6 +398,8 @@ function install_prerequisites {
     if [ ${P_USE_PYENV:-None} != None ]; then  
         install_pyenv
         install_py37
+    else
+        sudo apt install python3-dev python3-venv
     fi
     echo "Prerequisites installation finished. You must reconnect to update shell environment."
 }
