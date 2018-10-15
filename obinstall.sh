@@ -67,7 +67,6 @@ function print_help_message {
     echo "   postgresql         Installs postgreSQL."
     echo "   dependencies       Install dependencies specific to this server by running ./install_dependencies.sh if it exists."
     echo "   odoo               Installs Odoo."
-    echo "   dependencies       Installs dependencies specific to this project."
     echo "   reset              Remove all buildout installed files."
     echo 
     exit
@@ -275,6 +274,7 @@ function install_packages_ubuntu_bionic {
 # installs all packages appart from postgresql
 function install_packages_amzn_2018_03 {
     echo "Youpiiiiiiiiiiiiiiiiiiiiiiiiiii"
+    sudo yum install -y openldap-devel
 }
 
 
