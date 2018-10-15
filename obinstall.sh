@@ -6,7 +6,11 @@ IKIO_OS="${IKIO_OS%\"}"
 IKIO_OS="${IKIO_OS#\"}"
 
 IKIO_OS_VERSION=`cat /etc/os-release | grep VERSION_ID= | cut -d "=" -f 2 | cut -d "\"" -f 2`
+
+# Extract version code name or default to version then normalise name by replacing . by _
 IKIO_OS_VERSION_CODENAME=`cat /etc/os-release | grep VERSION_CODENAME= | cut -d "=" -f 2 | cut -d "\"" -f 2`
+IKIO_OS_VERSION_CODENAME=${P_USE_PYENV:-$IKIO_OS_VERSION} 
+IKIO_OS_VERSION_CODENAME=${IKIO_OS_VERSION_CODENAME//\./_}
 
 #P_USE_PYENV=3.7.0
 P_ODOO_VERSION=11
@@ -189,7 +193,7 @@ function parseargs {
         echo "debug: SCRIPT_COMMAND           = ${SCRIPT_COMMAND}"
         echo "debug: IKIO_OS                  = ${IKIO_OS}"
         echo "debug: IKIO_OS_VERSION          = ${IKIO_OS_VERSION}"
-        echo "debug: IKIO_OS_VERSION_CODENAME = ${IKIO_OS_VERSION}"
+        echo "debug: IKIO_OS_VERSION_CODENAME = ${IKIO_OS_VERSION_CODENAME}"
     fi
 }
 
@@ -206,20 +210,8 @@ function reload_shell {
 
 
 # We need to add P_LOCALE as we will use it to install postgresql
-
-function setup_locale {
-
-    # Add the locale
-    if [ $IKIO_OS$IKIO_OS_VERSION == ubuntu18.04 ]; then
-        sudo apt install -y language-pack-fr
-        sudo update-locale LANGUAGE="fr_FR.UTF-8" LC_ALL="fr_FR.UTF-8"
-    else
-        sudo locale-gen $P_LOCALE_LANG $P_LOCALE
-        sudo update-locale    
-    fi
-    reload_shell
-
-    # Update bashrc with locale if needed
+# Original script
+#    # Update bashrc with locale if needed
 #    if grep -Fxq "# Added by inouk Odoo install.sh" $HOME/.bashrc ; then
 #        echo "Skipping $HOME/.bashrc update"
 #    else
@@ -232,6 +224,27 @@ function setup_locale {
 #export LC_CTYPE=fr_FR.UTF-8
 #EOT
 #    fi
+
+function setup_locale {
+
+    # Add the locale
+    if [ $IKIO_OS$IKIO_OS_VERSION == ubuntu18.04 ]; then
+        sudo apt install -y language-pack-fr
+        sudo update-locale LANGUAGE="fr_FR.UTF-8" LC_ALL="fr_FR.UTF-8"
+        reload_shell
+    elif [ $IKIO_OS$IKIO_OS_VERSION == amzn2018.03 ]; then
+        sudo cat > /etc/sysconfig/i18n << EOT
+#
+# obinstall.sh locale setup
+LANG=fr_FR.UTF-8
+#LC_ALL=fr_FR.UTF-8
+EOT
+        echo "You must reboot to apply new locale."
+    else 
+        echo "setup_locale not implemented on \"${IKIO_OS} ${IKIO_OS_VERSION}\"."
+        exit 1
+    fi
+
     
 }
 
@@ -257,6 +270,16 @@ function install_packages_ubuntu_bionic {
     sudo apt install -y bzr mercurial git
     sudo apt install -y curl htop vim tmux
 }
+
+#
+# installs all packages appart from postgresql
+function install_packages_amzn_2018_03 {
+    echo "Youpiiiiiiiiiiiiiiiiiiiiiiiiiii"
+}
+
+
+
+
 
 #
 # installs postgresql ubuntu / debian repository
@@ -301,6 +324,10 @@ function install_postgresql {
         install_postgresql_ubuntu
         sudo su - postgres -c "psql -c \"CREATE ROLE $P_USERNAME WITH LOGIN SUPERUSER CREATEDB CREATEROLE PASSWORD '$P_PASSWORD';\""
         sudo su - postgres -c "psql -c \"CREATE DATABASE $P_USERNAME;\""
+    else
+        echo "Error: Postgresql installation is not supported on \"${IKIO_OS}\"."
+        echo "For the sake of performance, You should connect to AWS RDS or any other postgreSQL database."
+        echo ""
     fi
 }
 
@@ -392,17 +419,38 @@ function install_wkhtml2pdf_ubuntu {
     fi
 }
 
-# installs all system prerequistes
-function install_prerequisites {
-    install_packages_${IKIO_OS}_${IKIO_OS_VERSION_CODENAME}
-    install_wkhtml2pdf_${IKIO_OS}
+function install_python_ubuntu {
     if [ ${P_USE_PYENV:-None} != None ]; then  
         install_pyenv
         install_py37
     else
         sudo apt install python3-dev python3-venv
     fi
-    echo "Prerequisites installation finished. You must reconnect to update shell environment."
+}
+
+function install_python_amzn {
+    if [ ${P_USE_PYENV:-None} != None ]; then  
+        echo "ERROR: pyenv installation is not implemented on \"$IKIO_OS\" Linux"
+        #install pyenv
+        #install_py37
+        exit 1
+    else
+        #echo "Skipping python3 installation as it is already installed in \"${IKIO_OS}\" Linux."
+        sudo yum install python36-devel
+    fi
+}
+
+
+# installs all system prerequistes
+function install_prerequisites {
+    install_packages_${IKIO_OS}_${IKIO_OS_VERSION_CODENAME}
+    install_wkhtml2pdf_${IKIO_OS}
+    install_python_${IKIO_OS}
+    
+    echo 
+    echo "Prerequisites installation finished."
+    echo "You must reconnect to update shell environment."
+    echo
 }
 
 
@@ -460,14 +508,13 @@ function install_dependencies {
 }
 
 function dev_test {
-    P_USE_PYENV=3.7.0
+    #P_USE_PYENV=3.7.0
     #P_USE_PYENV=
-    
-    if [ ${P_USE_PYENV:-None} != None ]; then  
-        echo "is set"
-    fi
-    
-
+    #
+    #if [ ${P_USE_PYENV:-None} != None ]; then  
+    #    echo "is set"
+    #fi
+    echo "done"
     
 }
 
