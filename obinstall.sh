@@ -337,13 +337,13 @@ function install_postgresql_ubuntu {
     
     if [ $P_PG_VERSION == 9.6 ]; then
         echo "Installing postgreSQL 9 from Official postgresql.org repository."
-        sudo apt-get install postgresql-9.6 postgresql-contrib-9.6
+        sudo apt-get install -y postgresql-9.6 postgresql-contrib-9.6
     elif [ $P_PG_VERSION == 10 ]; then
         echo "Installing postgreSQL 10 from Official postgresql.org repository."
-        sudo apt-get install postgresql-10 postgresql-contrib-10
+        sudo apt-get install -y postgresql-10 postgresql-contrib-10
     elif [ $P_PG_VERSION == 11 ]; then
         echo "Installing postgreSQL 11 from Official postgresql.org repository."
-        sudo apt-get install postgresql-11 postgresql-contrib-11
+        sudo apt-get install -y postgresql-11 postgresql-contrib-11
     else
         echo "Unsupported postgresql: \"$P_PG_VERSION\" version. See help." 
         exit 1
