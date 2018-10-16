@@ -265,8 +265,10 @@ function install_packages_ubuntu_bionic {
  
     sudo apt install -y libz-dev gcc
     sudo apt install -y libxml2-dev libxslt1-dev
+
     # For Python 3.7
     sudo apt install -y libbz2-dev libreadline-dev libsqlite3-dev zlib1g-dev
+
     sudo apt install -y libpq-dev
     sudo apt install -y libldap2-dev libsasl2-dev
     sudo apt install -y libjpeg-dev libfreetype6-dev liblcms2-dev
@@ -280,7 +282,7 @@ function install_packages_ubuntu_bionic {
 }
 
 #
-# installs all packages on ubuntu 18.04/bionic except from postgresql
+# installs all packages on ubuntu 18.04/xenial except from postgresql
 function install_packages_ubuntu_xenial {
     sudo apt-get update
     sudo apt-get upgrade -y
@@ -288,6 +290,10 @@ function install_packages_ubuntu_xenial {
  
     sudo apt install -y libz-dev gcc
     sudo apt install -y libxml2-dev libxslt1-dev
+
+    # For Python 3.7
+    sudo apt install -y libbz2-dev libreadline-dev libsqlite3-dev zlib1g-dev
+    
     sudo apt install -y libpq-dev
     sudo apt install -y libldap2-dev libsasl2-dev
     sudo apt install -y libjpeg-dev libfreetype6-dev liblcms2-dev
@@ -367,9 +373,8 @@ function install_pyenv {
     if [ ! -f ~/.obinstallsh.pyenv ]; then
         git clone https://github.com/pyenv/pyenv.git ~/.pyenv
         grep "# obinstall.sh added pyenv" ~/.bashrc
-        if [ $? -gt 0 ]
-        then
-            cat >> /home/ubuntu/.bashrc << 'EOT'
+        if [ $? -gt 0 ]; then
+            cat >> /home/$USER/.bashrc << 'EOT'
 
 #
 # obinstall.sh added pyenv
@@ -397,7 +402,7 @@ EOT
 function install_py37 {
     if [ ! -f ~/.obinstallsh.py37 ]; then
         echo "Installing Python 3.7"
-        pyenv install 3.7.0
+        pyenv install -f 3.7.0
         pyenv local 3.7.0
         touch ~/.obinstallsh.py37
         echo "Python 3.7.0 installed."
@@ -560,7 +565,9 @@ function dev_test {
     #if [ ${P_USE_PYENV:-None} != None ]; then  
     #    echo "is set"
     #fi
+    install_py37
     echo "done"
+
     
 }
 
