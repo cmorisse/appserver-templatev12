@@ -9,7 +9,7 @@ IKIO_OS_VERSION=`cat /etc/os-release | grep VERSION_ID= | cut -d "=" -f 2 | cut 
 
 # Extract version code name or default to version then normalise name by replacing . by _
 IKIO_OS_VERSION_CODENAME=`cat /etc/os-release | grep VERSION_CODENAME= | cut -d "=" -f 2 | cut -d "\"" -f 2`
-IKIO_OS_VERSION_CODENAME=${P_USE_PYENV:-$IKIO_OS_VERSION} 
+IKIO_OS_VERSION_CODENAME=${IKIO_OS_VERSION_CODENAME:-$IKIO_OS_VERSION} 
 IKIO_OS_VERSION_CODENAME=${IKIO_OS_VERSION_CODENAME//\./_}
 
 #P_USE_PYENV=3.7.0
@@ -271,6 +271,29 @@ function install_packages_ubuntu_bionic {
 }
 
 #
+# installs all packages on ubuntu 18.04/bionic except from postgresql
+function install_packages_ubuntu_xenial {
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    sudo apt-get install -y libsasl2-dev python-dev libldap2-dev libssl-dev
+ 
+    sudo apt install -y libz-dev gcc
+    sudo apt install -y libxml2-dev libxslt1-dev
+    sudo apt install -y libpq-dev
+    sudo apt install -y libldap2-dev libsasl2-dev
+    sudo apt install -y libjpeg-dev libfreetype6-dev liblcms2-dev
+    sudo apt install -y libopenjpeg5 libopenjpeg-dev
+    sudo apt install -y libwebp5  libwebp-dev
+    sudo apt install -y libtiff-dev
+    sudo apt install -y libffi-dev
+    sudo apt install -y libyaml-dev
+    sudo apt install -y bzr mercurial git
+    sudo apt install -y curl htop vim tmux
+
+    # ?????sudo apt install -y libopenjp2-7 libopenjp2-7-dev
+}
+
+#
 # installs all packages appart from postgresql
 function install_packages_amzn_2018_03 {
     sudo yum install -y openldap-devel
@@ -410,7 +433,16 @@ function install_wkhtml2pdf_amzn {
 
 function install_wkhtml2pdf_ubuntu {
     # wkhtmltopdf
-    if [ $IKIO_OS_VERSION_CODENAME == bionic ]; then
+    if [ $IKIO_OS_VERSION_CODENAME == xenial ]; then
+        echo "Installing wkhtml2pdf on Ubuntu Xenial"
+        sudo apt install -y fontconfig fontconfig-config fonts-dejavu-core libfontconfig1 libfontenc1 libxrender1 x11-common xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils
+        wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.xenial_amd64.deb
+        sudo dpkg -i wkhtmltox_0.12.5-1.xenial_amd64.deb
+        rm wkhtmltox_0.12.5-1.xenial_amd64.deb
+
+        rm wkhtmltox_0.12.5-1.bionic_amd64.deb
+
+    elif [ $IKIO_OS_VERSION_CODENAME == bionic ]; then
         echo "Installing wkhtml2pdf on Ubuntu Bionic"
         sudo apt install -y fontconfig fontconfig-config fonts-dejavu-core libfontconfig1 libfontenc1 libxrender1 x11-common xfonts-75dpi xfonts-base xfonts-encodings xfonts-utils
         wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb
@@ -423,11 +455,18 @@ function install_wkhtml2pdf_ubuntu {
 }
 
 function install_python_ubuntu {
-    if [ ${P_USE_PYENV:-None} != None ]; then  
+    if [ $IKIO_OS_VERSION_CODENAME == bionic ]; then
+        if [ ${P_USE_PYENV:-None} != None ]; then  
+            install_pyenv
+            install_py37
+        else
+            sudo apt install python3-dev python3-venv
+        fi
+    
+    elif [ $IKIO_OS_VERSION_CODENAME == xenial ]; then
         install_pyenv
         install_py37
-    else
-        sudo apt install python3-dev python3-venv
+
     fi
 }
 
