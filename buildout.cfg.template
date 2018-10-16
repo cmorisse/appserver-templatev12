@@ -35,6 +35,7 @@ eggs = num2words
        chardet
        psycogreen
 
+
 #
 # Odoo configuration
 #
@@ -42,18 +43,6 @@ eggs = num2words
 # directory identified by the data-dir parameter. 
 # Here you can set it's location:
 #options.data_dir = ../../odoo_data_dir
-
-#
-#   Configuration de gunicorn
-#   =========================
-#
-# 	Exemple:
-gunicorn = direct
-gunicorn.workers = 2
-gunicorn.timeout = 240
-gunicorn.max_requests = 2000
-gunicorn.virtual_memory_limit = 4500000000
-gunicorn.virtual_memory_reset = 4000000000
 
 
 [versions]
@@ -74,7 +63,6 @@ html2text=2016.9.19
 Jinja2=2.8.1
 libsass=0.12.3
 lxml=4.2.3
-
 Mako=1.0.4
 MarkupSafe=0.23
 mock=2.0.0
