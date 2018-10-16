@@ -9,7 +9,7 @@ IKIO_OS_VERSION=`cat /etc/os-release | grep VERSION_ID= | cut -d "=" -f 2 | cut 
 
 # Extract version code name or default to version then normalise name by replacing . by _
 IKIO_OS_VERSION_CODENAME=`cat /etc/os-release | grep VERSION_CODENAME= | cut -d "=" -f 2 | cut -d "\"" -f 2`
-IKIO_OS_VERSION_CODENAME=${P_USE_PYENV:-$IKIO_OS_VERSION} 
+IKIO_OS_VERSION_CODENAME=${IKIO_OS_VERSION_CODENAME:-$IKIO_OS_VERSION} 
 IKIO_OS_VERSION_CODENAME=${IKIO_OS_VERSION_CODENAME//\./_}
 
 #P_USE_PYENV=3.7.0
@@ -227,16 +227,25 @@ function reload_shell {
 function setup_locale {
 
     # Add the locale
-    if [ $IKIO_OS$IKIO_OS_VERSION == ubuntu18.04 ]; then
-        sudo apt install -y language-pack-fr
-        sudo update-locale LANGUAGE="fr_FR.UTF-8" LC_ALL="fr_FR.UTF-8"
+    if [ $IKIO_OS$IKIO_OS_VERSION == ubuntu16.04 ]; then
+        # Setup UTF8 locale
+        sudo locale-gen $P_LOCALE_LANG $P_LOCALE
+        sudo update-locale LANG="$P_LOCALE" LANGUAGE="$P_LOCALE" LC_ALL="$P_LOCALE"
+        echo "You must reboot to activate locale ${P_LOCALE}"
         reload_shell
+
+    elif [ $IKIO_OS$IKIO_OS_VERSION == ubuntu18.04 ]; then
+        sudo apt install -y language-pack-fr
+        sudo update-locale LANG="$P_LOCALE" LANGUAGE="$P_LOCALE" LC_ALL="$P_LOCALE"
+        reload_shell
+
     elif [ $IKIO_OS$IKIO_OS_VERSION == amzn2018.03 ]; then
         sudo cat > /etc/sysconfig/i18n << EOT
 #
 # obinstall.sh locale setup
-LANG=fr_FR.UTF-8
-#LC_ALL=fr_FR.UTF-8
+LANG=$P_LOCALE
+LANGUAGE=$P_LOCALE
+LC_ALL=$P_LOCALE
 EOT
         echo "You must reboot to apply new locale."
     else 
@@ -250,6 +259,29 @@ EOT
 #
 # installs all packages on ubuntu 18.04/bionic except from postgresql
 function install_packages_ubuntu_bionic {
+    sudo apt update
+    sudo apt upgrade -y
+    sudo apt install -y libsasl2-dev python-dev libldap2-dev libssl-dev
+ 
+    sudo apt install -y libz-dev gcc
+    sudo apt install -y libxml2-dev libxslt1-dev
+    # For Python 3.7
+    sudo apt install -y libbz2-dev libreadline-dev libsqlite3-dev zlib1g-dev
+    sudo apt install -y libpq-dev
+    sudo apt install -y libldap2-dev libsasl2-dev
+    sudo apt install -y libjpeg-dev libfreetype6-dev liblcms2-dev
+    sudo apt install -y libopenjp2-7 libopenjp2-7-dev
+    sudo apt install -y libwebp5  libwebp-dev
+    sudo apt install -y libtiff-dev
+    sudo apt install -y libffi-dev
+    sudo apt install -y libyaml-dev
+    sudo apt install -y bzr mercurial git
+    sudo apt install -y curl htop vim tmux
+}
+
+#
+# installs all packages on ubuntu 18.04/bionic except from postgresql
+function install_packages_ubuntu_xenial {
     sudo apt update
     sudo apt upgrade -y
     sudo apt install -y libsasl2-dev python-dev libldap2-dev libssl-dev
