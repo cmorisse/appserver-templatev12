@@ -227,16 +227,25 @@ function reload_shell {
 function setup_locale {
 
     # Add the locale
-    if [ $IKIO_OS$IKIO_OS_VERSION == ubuntu18.04 ]; then
-        sudo apt install -y language-pack-fr
-        sudo update-locale LANGUAGE="fr_FR.UTF-8" LC_ALL="fr_FR.UTF-8"
+    if [ $IKIO_OS$IKIO_OS_VERSION == ubuntu16.04 ]; then
+        # Setup UTF8 locale
+        sudo locale-gen $P_LOCALE_LANG $P_LOCALE
+        sudo update-locale LANG="$P_LOCALE" LANGUAGE="$P_LOCALE" LC_ALL="$P_LOCALE"
+        echo "You must reboot to activate locale ${P_LOCALE}"
         reload_shell
+
+    elif [ $IKIO_OS$IKIO_OS_VERSION == ubuntu18.04 ]; then
+        sudo apt install -y language-pack-fr
+        sudo update-locale LANG="$P_LOCALE" LANGUAGE="$P_LOCALE" LC_ALL="$P_LOCALE"
+        reload_shell
+
     elif [ $IKIO_OS$IKIO_OS_VERSION == amzn2018.03 ]; then
         sudo cat > /etc/sysconfig/i18n << EOT
 #
 # obinstall.sh locale setup
-LANG=fr_FR.UTF-8
-#LC_ALL=fr_FR.UTF-8
+LANG=$P_LOCALE
+LANGUAGE=$P_LOCALE
+LC_ALL=$P_LOCALE
 EOT
         echo "You must reboot to apply new locale."
     else 
@@ -289,7 +298,6 @@ function install_packages_ubuntu_xenial {
     sudo apt install -y libyaml-dev
     sudo apt install -y bzr mercurial git
     sudo apt install -y curl htop vim tmux
-
     # ?????sudo apt install -y libopenjp2-7 libopenjp2-7-dev
 }
 
@@ -299,10 +307,6 @@ function install_packages_amzn_2018_03 {
     sudo yum install -y openldap-devel
     
 }
-
-
-
-
 
 #
 # installs postgresql ubuntu / debian repository
