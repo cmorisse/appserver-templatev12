@@ -273,8 +273,8 @@ function install_packages_ubuntu_bionic {
 #
 # installs all packages appart from postgresql
 function install_packages_amzn_2018_03 {
-    echo "Youpiiiiiiiiiiiiiiiiiiiiiiiiiii"
     sudo yum install -y openldap-devel
+    
 }
 
 
@@ -324,7 +324,10 @@ function install_postgresql {
         install_postgresql_ubuntu
         sudo su - postgres -c "psql -c \"CREATE ROLE $P_USERNAME WITH LOGIN SUPERUSER CREATEDB CREATEROLE PASSWORD '$P_PASSWORD';\""
         sudo su - postgres -c "psql -c \"CREATE DATABASE $P_USERNAME;\""
-    else
+    elif [ $IKIO_OS == amzn ]; then
+        sudo yum install -y https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-6-x86_64/pgdg-redhat10-10-2.noarch.rpm
+        sudo sed -i "s/rhel-\$releasever-\$basearch/rhel-6.9-x86_64/g" "/etc/yum.repos.d/pgdg-10-redhat.repo"
+        sudo yum install -y postgresql10
         echo "Error: Postgresql installation is not supported on \"${IKIO_OS}\"."
         echo "For the sake of performance, You should connect to AWS RDS or any other postgreSQL database."
         echo ""
