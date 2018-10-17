@@ -240,20 +240,18 @@ function setup_locale {
         reload_shell
 
     elif [ $IKIO_OS$IKIO_OS_VERSION == amzn2018.03 ]; then
-        sudo cat > /etc/sysconfig/i18n << EOT
+        sudo bash -c "cat > /etc/sysconfig/i18n << EOT
 #
 # obinstall.sh locale setup
 LANG=$P_LOCALE
 LANGUAGE=$P_LOCALE
 LC_ALL=$P_LOCALE
-EOT
+EOT"
         echo "You must reboot to apply new locale."
     else 
         echo "setup_locale not implemented on \"${IKIO_OS} ${IKIO_OS_VERSION}\"."
         exit 1
     fi
-
-    
 }
 
 #
@@ -357,13 +355,19 @@ function install_postgresql {
         install_postgresql_ubuntu
         sudo su - postgres -c "psql -c \"CREATE ROLE $P_USERNAME WITH LOGIN SUPERUSER CREATEDB CREATEROLE PASSWORD '$P_PASSWORD';\""
         sudo su - postgres -c "psql -c \"CREATE DATABASE $P_USERNAME;\""
+    
     elif [ $IKIO_OS == amzn ]; then
-        sudo yum install -y https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-6-x86_64/pgdg-redhat10-10-2.noarch.rpm
-        sudo sed -i "s/rhel-\$releasever-\$basearch/rhel-6.9-x86_64/g" "/etc/yum.repos.d/pgdg-10-redhat.repo"
-        sudo yum install -y postgresql10
-        echo "Error: Postgresql installation is not supported on \"${IKIO_OS}\"."
-        echo "For the sake of performance, You should connect to AWS RDS or any other postgreSQL database."
-        echo ""
+        if [ $IKIO_OS_VERSION_CODENAME == 2018_03 ]; then
+            sudo yum install -y https://download.postgresql.org/pub/repos/yum/10/redhat/rhel-6-x86_64/pgdg-redhat10-10-2.noarch.rpm
+            sudo sed -i "s/rhel-\$releasever-\$basearch/rhel-6.9-x86_64/g" "/etc/yum.repos.d/pgdg-10-redhat.repo"
+            sudo yum install -y postgresql10.x86_64 postgresql10-contrib.x86_64
+            echo "PostgreSQL 10 Server cannot be installed on $IKIO_OS $IKIO_OS_VERSION Linux."
+            echo "Only PostgreSQL 10 has been installed. You should connect to AWS RDS or any other postgreSQL database."
+        else
+            echo "Error: Postgresql installation is not supported on \"${IKIO_OS}\"."
+            echo "For the sake of performance, You should connect to AWS RDS or any other postgreSQL database."
+            echo ""
+        fi
     fi
 }
 
