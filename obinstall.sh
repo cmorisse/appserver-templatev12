@@ -535,7 +535,7 @@ function install_odoo {
     #py36/bin/pip install $PYPI_INDEX num2words==0.5.4
     echo
     echo "Your commands are now available in ./bin"
-    echo "Python is in ./py36. Don't forget to launch 'source py36/bin/activate'."
+    echo "Python is in ./py3x. Don't forget to launch 'source py3x/bin/activate'."
     echo 
 }
 
