@@ -30,6 +30,8 @@ addons = 	local ./project_addons/
 # Uncomment and move up for Odoo Enterprise
 #            git git@github.com:odoo/enterprise.git  parts/enterprise 12.0
 
+options.db_template = template1
+
 eggs = num2words
        phonenumbers
        chardet
