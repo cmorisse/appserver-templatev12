@@ -64,6 +64,7 @@ function print_help_message {
     echo "   help               Prints this message."
     echo "   setup-locale       Setup locale (default=$P_LOCALE)"
     echo "   prerequisites      Installs system prerequisites specific to \"$IKIO_OS $IKIO_OS_VERSION\""
+    echo "   python             Installs only python (useful on shared environments where only pyenv is missing)."
     echo "   postgresql         Installs postgreSQL."
     echo "   dependencies       Install dependencies specific to this server by running ./install_dependencies.sh if it exists."
     echo "   odoo               Installs Odoo."
@@ -163,6 +164,10 @@ function parseargs {
             ;;
             postgresql)  # Install odoo command
             SCRIPT_COMMAND=install_postgresql
+            shift # past argument with no value
+            ;;
+            python)  # Install python
+            SCRIPT_COMMAND=install_python
             shift # past argument with no value
             ;;
             devtest)  # This is an undocumented command used for script writing and debugging
@@ -508,6 +513,15 @@ function install_prerequisites {
     echo
 }
 
+# installs python
+function install_python {
+    install_python_${IKIO_OS}
+    
+    echo 
+    echo "Python installation finished."
+    echo "You must reconnect to update shell environment."
+    echo
+}
 
 function install_odoo {
     
